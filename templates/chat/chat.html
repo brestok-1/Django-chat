@@ -1,0 +1,180 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap css -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+          integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <!-- Connect style.css -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{% url 'chat' %}">
+            <img src="https://img.icons8.com/nolan/48/warning-shield.png" width="30" class="logo"/>
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+                aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav ml-auto">
+                {% if user.is_authenticated %}
+                    <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                {% else %}
+                    <a class="nav-link active" aria-current="page" href="{% url 'login' %}">Login</a>
+                    <a class="nav-link" href="{% url 'sign-up' %}">Sign Up</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>
+<main class="content">
+    <div class="container p-0">
+
+        <div class="card">
+            <div class="row g-0">
+                <div class="col-12 col-lg-5 col-xl-3 border-right pr-0">
+
+                    <h5 class="text-center bg-light fs-4 py-3 px-0">
+                        Current users
+                    </h5>
+
+                    {% for user in users %}
+                        <a href="#" class="list-group-item list-group-item-action bg-light border-0">
+                            <div class="d-flex align-items-start">
+                                <div class="flex-grow-1 ml-3 text-center pr-1">
+                                    {{ user.username }}
+                                    <div class="small"><span class="fas fa-circle chat-online"></span></div>
+                                </div>
+                            </div>
+                        </a>
+                    {% endfor %}
+
+                    <hr class="d-block d-lg-none mt-1 mb-0">
+                </div>
+                <div class="col-12 col-lg-7 col-xl-9">
+                    <div class="py-2 px-4 border-bottom d-none d-lg-block" id="chatheader">
+                        <div class="d-flex align-items-center py-1">
+                            <div class="flex-grow-1 pl-3">
+                                <strong>Dryga Chat</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="position-relative">
+                        <div class="chat-messages p-4" id="mychat">
+                            {% for message in messages %}
+                                {% if request.user == message.user %}
+                                    <div class="chat-message-right mb-4">
+                                        <div class="flex-shrink-1 bg-light rounded py-2 px-3 ml-3 w-60 d-inline-block">
+                                            <div class="font-weight-bold mb-1"><span class="pr-3">You</span></span><span
+                                                    class="text-muted small text-nowrap mt-2">{{ message.time_created|date:"m/d h:i A" }}</span>
+                                            </div>
+                                            {{ message.text }}
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <div class="chat-message-left pb-4">
+                                        <div class="flex-shrink-1 bg-light rounded py-2 px-3 ml-3 d-inline-block w-60">
+                                            <div class="font-weight-bold mb-1"><span
+                                                    class="pr-3">{{ message.user }} </span><span
+                                                    class="text-muted small text-nowrap mt-2">{{ message.time_created|date:"m/d h:i A" }}</span>
+                                            </div>
+                                            {{ message.text }}
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+
+
+                        </div>
+                    </div>
+
+                    <div class="flex-grow-0 py-3 px-4 border-top" id="keyboard">
+                        <form action="{% url 'chat' %}" method="post" class="mb-5">
+                            {% csrf_token %}
+                            <div class="form-row">
+                                <div class="col">
+                                    {{ form.text }}
+                                </div>
+                                <div class="col-auto">
+                                    <button class="btn btn-outline-primary" type="submit" id="button-addon2">Button
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+        integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+        integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+        crossorigin="anonymous"></script>
+<script>
+    const headerHeight = document.querySelector('nav').offsetHeight;
+    const keyboardHeight = document.getElementById('keyboard').offsetHeight;
+    const chatHeader = document.getElementById('chatheader').offsetHeight;
+    const totalMarginHeight = headerHeight + keyboardHeight + chatHeader;
+    const windowHeight = window.innerHeight;
+
+    const mainHeight = windowHeight - totalMarginHeight - 5;
+    document.getElementById('mychat').style.height = mainHeight + 'px';
+
+</script>
+<script>
+    const ws_url = '/ws/new-message/'
+    const socket = new WebSocket("ws://" + window.location.host + ws_url);
+    const mychat = document.getElementById('mychat')
+    mychat.scrollTop = mychat.scrollHeight
+    socket.onmessage = function (event) {
+        const data = JSON.parse(event.data)
+        const time_created = new Date(data.time_created).toLocaleString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+            day: '2-digit',
+            month: '2-digit'
+        }).replace(',', '');
+        const newMessage = document.createElement('div')
+        if(data.username === `{{ request.user }}`){
+            newMessage.innerHTML = `<div class="chat-message-right mb-4">
+                                        <div class="flex-shrink-1 bg-light rounded py-2 px-3 ml-3 w-60 d-inline-block">
+                                            <div class="font-weight-bold mb-1"><span class="pr-3">You</span></span><span
+                                                    class="text-muted small text-nowrap mt-2">${time_created}</span>
+                                            </div>
+                                            ${data.text}
+                                        </div>
+                                    </div>`
+        } else {
+            newMessage.innerHTML = `<div class="chat-message-left mb-4">
+                                        <div class="flex-shrink-1 bg-light rounded py-2 px-3 ml-3 w-60 d-inline-block">
+                                            <div class="font-weight-bold mb-1"><span class="pr-3">${data.username}</span></span><span
+                                                    class="text-muted small text-nowrap mt-2">${time_created}</span>
+                                            </div>
+                                            ${data.text}
+                                        </div>
+                                    </div>`
+        }
+        mychat.appendChild(newMessage)
+        mychat.scrollTop = mychat.scrollHeight
+    }
+</script>
+</body>
+</html>
